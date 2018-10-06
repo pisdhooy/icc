@@ -4,11 +4,12 @@ import (
 	"os"
 
 	"github.com/pisdhooy/fsutil"
+	"github.com/pisdhooy/icc/header"
 	"github.com/pisdhooy/icc/tags"
 )
 
 type ICCProfile struct {
-	Header   *Header
+	Header   *header.Header
 	TagTable *TagTable
 	TagData  [][]byte
 }
@@ -27,7 +28,7 @@ func NewICCProfile() *ICCProfile {
 }
 
 func (iccProfile *ICCProfile) Parse(file *os.File) {
-	header := NewHeader()
+	header := header.NewHeader()
 	tagTable := NewTagList()
 
 	header.Parse(file)
@@ -35,6 +36,8 @@ func (iccProfile *ICCProfile) Parse(file *os.File) {
 	tagTable.Parse(file)
 	iccProfile.TagTable = tagTable
 	for i := 0; i < int(iccProfile.TagTable.Count); i++ {
+		offset := int64(iccProfile.TagTable.Tags[i].Offset)
+		file.Seek(offset, 0)
 		buffer := fsutil.ReadBytesNInt(file, iccProfile.TagTable.Tags[i].Size)
 		iccProfile.TagData = append(iccProfile.TagData, buffer)
 	}

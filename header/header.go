@@ -1,4 +1,4 @@
-package icc
+package header
 
 import (
 	"os"
@@ -132,7 +132,7 @@ func (header *Header) GetFullname(field string) string {
 	if val, ok := nameMap[field]; ok {
 		return val
 	}
-	return field
+	return "unknown manufacturer"
 }
 
 func (vec3_32 *Vec3_32) Parse(file *os.File) {

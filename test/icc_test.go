@@ -9,7 +9,7 @@ import (
 	"github.com/pisdhooy/icc"
 )
 
-func TestICCParser(t *testing.T) {
+func TestICCParserV2(t *testing.T) {
 	profile := icc.NewICCProfile()
 	file, err := os.Open("files/Probev1_ICCv2.icc")
 	if err != nil {
@@ -17,5 +17,16 @@ func TestICCParser(t *testing.T) {
 	}
 
 	profile.Parse(file)
-	spew.Dump(profile.TagData[0])
+	spew.Dump(profile.TagData)
+}
+
+func TestICCParserV4(t *testing.T) {
+	profile := icc.NewICCProfile()
+	file, err := os.Open("files/Probev1_ICCv4.icc")
+	if err != nil {
+		t.Error(err)
+	}
+
+	profile.Parse(file)
+	spew.Dump(profile.TagData)
 }
