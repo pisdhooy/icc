@@ -3,7 +3,8 @@ package icc
 import (
 	"os"
 
-	util "github.com/fabulousduck/pisdui/pisdui/util/file"
+	"github.com/pisdhooy/fsutil"
+	"github.com/pisdhooy/icc/tags"
 )
 
 type ICCProfile struct {
@@ -14,13 +15,7 @@ type ICCProfile struct {
 
 type TagTable struct {
 	Count uint32
-	Tags  []*Tag
-}
-
-type Tag struct {
-	Sig    string
-	Offset uint32
-	Size   uint32
+	Tags  []*tags.Tag
 }
 
 func (iccProfile *ICCProfile) GetTypeID() int {
@@ -39,10 +34,10 @@ func (iccProfile *ICCProfile) Parse(file *os.File) {
 	iccProfile.Header = header
 	tagTable.Parse(file)
 	iccProfile.TagTable = tagTable
-	// for i := 0; i < int(iccProfile.TagTable.Count); i++ {
-	// 	buffer := util.ReadBytesNInt(file, iccProfile.TagTable.Tags[i].Size)
-	// 	iccProfile.TagData = append(iccProfile.TagData, buffer)
-	// }
+	for i := 0; i < int(iccProfile.TagTable.Count); i++ {
+		buffer := fsutil.ReadBytesNInt(file, iccProfile.TagTable.Tags[i].Size)
+		iccProfile.TagData = append(iccProfile.TagData, buffer)
+	}
 }
 
 func NewTagList() *TagTable {
@@ -50,20 +45,10 @@ func NewTagList() *TagTable {
 }
 
 func (tagTable *TagTable) Parse(file *os.File) {
-	tagTable.Count = util.ReadBytesLong(file)
+	tagTable.Count = fsutil.ReadBytesLong(file)
 	for i := 0; i < int(tagTable.Count); i++ {
-		tag := NewTag()
+		tag := tags.NewTag()
 		tag.Parse(file)
 		tagTable.Tags = append(tagTable.Tags, tag)
 	}
-}
-
-func NewTag() *Tag {
-	return new(Tag)
-}
-
-func (tag *Tag) Parse(file *os.File) {
-	tag.Sig = util.ReadBytesString(file, 4)
-	tag.Offset = util.ReadBytesLong(file)
-	tag.Size = util.ReadBytesLong(file)
 }

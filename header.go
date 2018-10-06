@@ -3,8 +3,7 @@ package icc
 import (
 	"os"
 
-	util "github.com/fabulousduck/pisdui/pisdui/util/file"
-	"github.com/fabulousduck/pisdui/pisdui/util/shape"
+	"github.com/pisdhooy/fsutil"
 )
 
 type Header struct {
@@ -22,7 +21,7 @@ type Header struct {
 	Model           uint32
 	Attributes      uint64
 	RenderingIntent uint32
-	Illuminant      *shape.Vec3_32
+	Illuminant      *Vec3_32
 	Creator         string
 	ProfileId       []byte
 	Reserved        []byte
@@ -37,6 +36,12 @@ type DateTime struct {
 	Seconds uint16
 }
 
+type Vec3_32 struct {
+	X uint32
+	Y uint32
+	Z uint32
+}
+
 func NewHeader() *Header {
 	return new(Header)
 }
@@ -45,48 +50,52 @@ func NewDateTime() *DateTime {
 	return new(DateTime)
 }
 
+func NewVec3_32() *Vec3_32 {
+	return new(Vec3_32)
+}
+
 func (dateTime *DateTime) Parse(file *os.File) {
-	dateTime.Year = util.ReadBytesShort(file)
-	dateTime.Month = util.ReadBytesShort(file)
-	dateTime.Day = util.ReadBytesShort(file)
-	dateTime.Hours = util.ReadBytesShort(file)
-	dateTime.Minutes = util.ReadBytesShort(file)
-	dateTime.Seconds = util.ReadBytesShort(file)
+	dateTime.Year = fsutil.ReadBytesShort(file)
+	dateTime.Month = fsutil.ReadBytesShort(file)
+	dateTime.Day = fsutil.ReadBytesShort(file)
+	dateTime.Hours = fsutil.ReadBytesShort(file)
+	dateTime.Minutes = fsutil.ReadBytesShort(file)
+	dateTime.Seconds = fsutil.ReadBytesShort(file)
 }
 
 func (header *Header) Parse(file *os.File) {
 	dateTimeObject := NewDateTime()
-	illuminantObject := shape.NewVec3_32()
+	illuminantObject := NewVec3_32()
 
-	header.Size = util.ReadBytesLong(file)
-	header.Cmmid = util.ReadBytesString(file, 4)
-	header.Version = util.ReadBytesLong(file)
-	header.DeviceClass = util.ReadBytesString(file, 4)
-	header.ColorSpace = util.ReadBytesString(file, 4)
-	header.Pcs = util.ReadBytesString(file, 4)
+	header.Size = fsutil.ReadBytesLong(file)
+	header.Cmmid = fsutil.ReadBytesString(file, 4)
+	header.Version = fsutil.ReadBytesLong(file)
+	header.DeviceClass = fsutil.ReadBytesString(file, 4)
+	header.ColorSpace = fsutil.ReadBytesString(file, 4)
+	header.Pcs = fsutil.ReadBytesString(file, 4)
 
 	dateTimeObject.Parse(file)
 
 	header.DateTime = dateTimeObject
 
-	header.Magic = util.ReadBytesString(file, 4)
-	header.Platform = util.ReadBytesString(file, 4)
-	header.Flags = util.ReadBytesLong(file)
+	header.Magic = fsutil.ReadBytesString(file, 4)
+	header.Platform = fsutil.ReadBytesString(file, 4)
+	header.Flags = fsutil.ReadBytesLong(file)
 
-	header.Manufacturer = util.ReadBytesString(file, 4)
+	header.Manufacturer = fsutil.ReadBytesString(file, 4)
 
-	header.Model = util.ReadBytesLong(file)
-	header.Attributes = util.ReadBytesLongLong(file)
+	header.Model = fsutil.ReadBytesLong(file)
+	header.Attributes = fsutil.ReadBytesLongLong(file)
 
-	header.RenderingIntent = util.ReadBytesLong(file)
+	header.RenderingIntent = fsutil.ReadBytesLong(file)
 
 	illuminantObject.Parse(file)
 
 	header.Illuminant = illuminantObject
-	header.Creator = util.ReadBytesString(file, 4)
+	header.Creator = fsutil.ReadBytesString(file, 4)
 
-	header.ProfileId = util.ReadBytesNInt(file, 16)
-	header.Reserved = util.ReadBytesNInt(file, 28)
+	header.ProfileId = fsutil.ReadBytesNInt(file, 16)
+	header.Reserved = fsutil.ReadBytesNInt(file, 28)
 }
 
 func (header *Header) GetFullname(field string) string {
@@ -124,4 +133,10 @@ func (header *Header) GetFullname(field string) string {
 		return val
 	}
 	return field
+}
+
+func (vec3_32 *Vec3_32) Parse(file *os.File) {
+	vec3_32.X = fsutil.ReadBytesLong(file)
+	vec3_32.Y = fsutil.ReadBytesLong(file)
+	vec3_32.Z = fsutil.ReadBytesLong(file)
 }
