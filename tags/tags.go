@@ -3,7 +3,7 @@ package tags
 import (
 	"os"
 
-	"github.com/pisdhooy/fsutil"
+	"github.com/pisdhooy/fmtbytes"
 )
 
 type Tag struct {
@@ -17,7 +17,7 @@ func NewTag() *Tag {
 }
 
 func (tag *Tag) Parse(file *os.File) {
-	tag.Sig = fsutil.ReadBytesString(file, 4)
-	tag.Offset = fsutil.ReadBytesLong(file)
-	tag.Size = fsutil.ReadBytesLong(file)
+	tag.Sig = fmtbytes.ReadBytesString(file, 4)
+	tag.Offset = fmtbytes.ReadBytesLong(file)
+	tag.Size = fmtbytes.ReadBytesLong(file)
 }

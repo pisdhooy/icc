@@ -3,7 +3,7 @@ package icc
 import (
 	"os"
 
-	"github.com/pisdhooy/fsutil"
+	"github.com/pisdhooy/fmtbytes"
 	"github.com/pisdhooy/icc/header"
 	"github.com/pisdhooy/icc/tags"
 )
@@ -38,7 +38,7 @@ func (iccProfile *ICCProfile) Parse(file *os.File) {
 	for i := 0; i < int(iccProfile.TagTable.Count); i++ {
 		offset := int64(iccProfile.TagTable.Tags[i].Offset)
 		file.Seek(offset, 0)
-		buffer := fsutil.ReadBytesNInt(file, iccProfile.TagTable.Tags[i].Size)
+		buffer := fmtbytes.ReadBytesNInt(file, iccProfile.TagTable.Tags[i].Size)
 		iccProfile.TagData = append(iccProfile.TagData, buffer)
 	}
 }
@@ -48,7 +48,7 @@ func NewTagList() *TagTable {
 }
 
 func (tagTable *TagTable) Parse(file *os.File) {
-	tagTable.Count = fsutil.ReadBytesLong(file)
+	tagTable.Count = fmtbytes.ReadBytesLong(file)
 	for i := 0; i < int(tagTable.Count); i++ {
 		tag := tags.NewTag()
 		tag.Parse(file)
