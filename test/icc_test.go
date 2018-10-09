@@ -4,8 +4,6 @@ import (
 	"os"
 	"testing"
 
-	"github.com/davecgh/go-spew/spew"
-
 	"github.com/pisdhooy/icc"
 )
 
@@ -16,8 +14,8 @@ func TestICCParserV2(t *testing.T) {
 		t.Error(err)
 	}
 
-	profile.Parse(file)
-	spew.Dump(profile.TagData)
+	profile.Parse(file, 2)
+	// spew.Dump(profile.TagTable)
 }
 
 func TestICCParserV4(t *testing.T) {
@@ -27,6 +25,6 @@ func TestICCParserV4(t *testing.T) {
 		t.Error(err)
 	}
 
-	profile.Parse(file)
-	spew.Dump(profile.TagData)
+	profile.Parse(file, 4)
+	// spew.Dump(profile.TagTable)
 }
