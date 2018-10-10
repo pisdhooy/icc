@@ -1,6 +1,7 @@
 package description
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/pisdhooy/fmtbytes"
@@ -39,16 +40,20 @@ func (name *Name) Parse(file *os.File, tagStartPos int) {
 	name.FirstNameCountryCode = fmtbytes.ReadBytesShort(file)
 	name.FirstNameLength = fmtbytes.ReadBytesLong(file)
 	name.FirstNameOffset = fmtbytes.ReadBytesLong(file)
-
 	tmpOldFilePointerPos, _ := file.Seek(0, 1)
 	file.Seek(int64(int(name.FirstNameOffset)+tagStartPos), 1)
 	name.Value = fmtbytes.ReadBytesString(file, int(name.FirstNameLength))
 	file.Seek(tmpOldFilePointerPos, 1)
 }
 
-func (description *Description) Parse(file *os.File) {
+func (description *Description) Parse(file *os.File) error {
 	description.Signature = fmtbytes.ReadBytesString(file, 4)
+	if description.Signature != "mluc" {
+		return fmt.Errorf("invalid description signature")
+	}
+
 	description.Reserved = fmtbytes.ReadRawBytes(file, 4)
+
 	description.NumberOfNames = fmtbytes.ReadBytesLong(file)
 	description.NameRecordSize = fmtbytes.ReadBytesLong(file)
 
@@ -58,5 +63,5 @@ func (description *Description) Parse(file *os.File) {
 		name.Parse(file, int(currentFilePointerPos))
 		description.Names = append(description.Names, name)
 	}
-
+	return nil
 }

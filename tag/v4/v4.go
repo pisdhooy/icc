@@ -34,6 +34,8 @@ func ParseTagData(file *os.File, tagName string) *TagV4 {
 		descObject := description.NewDescription()
 		descObject.Parse(file)
 		tag.Value = descObject
+	case "A2B0":
+
 	}
 	spew.Dump(tag.Value)
 
