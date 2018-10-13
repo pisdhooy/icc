@@ -25,6 +25,9 @@ func (tag *TableTag) Parse(file *os.File) {
 	tag.Sig = fmtbytes.ReadBytesString(file, 4)
 	tag.Offset = fmtbytes.ReadBytesLong(file)
 	tag.Size = fmtbytes.ReadBytesLong(file)
+	if tag.Size%4 != 0 {
+		tag.Size = ((tag.Size + 4 - 1) / 4) * 4
+	}
 }
 
 func NewTagList() *TagTable {

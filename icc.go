@@ -1,7 +1,10 @@
 package icc
 
 import (
+	"fmt"
 	"os"
+
+	"github.com/davecgh/go-spew/spew"
 
 	"github.com/pisdhooy/fmtbytes"
 	"github.com/pisdhooy/icc/header"
@@ -23,6 +26,7 @@ func NewICCProfile() *ICCProfile {
 }
 
 func (iccProfile *ICCProfile) Parse(file *os.File) {
+	tmpFP, _ := file.Seek(0, 1)
 	header := header.NewHeader()
 	tagTable := table.NewTagList()
 
@@ -30,10 +34,13 @@ func (iccProfile *ICCProfile) Parse(file *os.File) {
 	iccProfile.Header = header
 	tagTable.Parse(file)
 	iccProfile.TagTable = tagTable
+
 	for i := 0; i < int(iccProfile.TagTable.Count); i++ {
 		offset := int64(iccProfile.TagTable.Tags[i].Offset)
-		file.Seek(offset, 0)
+		file.Seek(tmpFP+offset, 0)
 		buffer := fmtbytes.ReadBytesNInt(file, iccProfile.TagTable.Tags[i].Size)
 		iccProfile.TagData = append(iccProfile.TagData, buffer)
 	}
+	fmt.Println("FP AFTER ICC PARSE")
+	spew.Dump(file.Seek(0, 1))
 }

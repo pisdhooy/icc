@@ -3,8 +3,6 @@ package v4
 import (
 	"os"
 
-	"github.com/davecgh/go-spew/spew"
-
 	"github.com/pisdhooy/icc/tag/v4/types/description"
 )
 
@@ -37,7 +35,6 @@ func ParseTagData(file *os.File, tagName string) *TagV4 {
 	case "A2B0":
 
 	}
-	spew.Dump(tag.Value)
 
 	return tag
 }
